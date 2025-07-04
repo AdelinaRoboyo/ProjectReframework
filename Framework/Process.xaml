@@ -2,7 +2,6 @@
   <x:Members>
     <x:Property sap2010:Annotation.AnnotationText="Transaction item to be processed." Name="in_TransactionItem" Type="InArgument(sd:DataRow)" />
     <x:Property sap2010:Annotation.AnnotationText="Dictionary structure to store configuration data of the process (settings, constants and assets)." Name="in_Config" Type="InArgument(scg:Dictionary(x:String, x:Object))" />
-    <x:Property Name="in_dt_TransactionData" Type="InArgument(sd:DataTable)" />
   </x:Members>
   <VisualBasic.Settings>
     <x:Null />
@@ -255,15 +254,18 @@
       <AssemblyReference>Microsoft.CodeAnalysis.Features</AssemblyReference>
     </scg:List>
   </TextExpression.ReferencesForImplementation>
-  <Sequence sap2010:Annotation.AnnotationText="Invoke major steps of the business process, which are usually implemented by multiple subworkflows.&#xA;&#xA;If a BusinessRuleException is thrown, the transaction is skipped. &#xA;If another kind of exception occurs, the current transaction can be retried. " DisplayName="Process" sap:VirtualizedContainerService.HintSize="1261.6666666666667,1786" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="Invoke major steps of the business process, which are usually implemented by multiple subworkflows.&#xA;&#xA;If a BusinessRuleException is thrown, the transaction is skipped. &#xA;If another kind of exception occurs, the current transaction can be retried. " DisplayName="Process" sap:VirtualizedContainerService.HintSize="1531.6666666666667,1786" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="sc:IEnumerable" Name="enu_currentitem" />
       <Variable x:TypeArguments="x:String" Default="[in_TransactionItem(&quot;Name&quot;).ToString()]" Name="str_Name" />
       <Variable x:TypeArguments="x:String" Default="[in_TransactionItem(&quot;Last Name&quot;).ToString()]" Name="str_Last" />
       <Variable x:TypeArguments="x:String" Default="[in_TransactionItem(&quot;Secound Name&quot;).ToString()]" Name="str_Secound" />
       <Variable x:TypeArguments="s:DateTime" Default="[DateTime.Parse(in_TransactionItem(&quot;Date&quot;).ToString)]" Name="str_Dates" />
-      <Variable x:TypeArguments="x:String" Default="[String.Concat(str_Last.Substring(0, Math.Min(2, str_Last.Length)), str_Secound.Substring(0, Math.Min(2, str_Secound.Length)))]" Name="str_Inicial" />
-      <Variable x:TypeArguments="x:String" Default="[String.Concat(str_Last.Substring(0, Math.Min(2, str_Last.Length)))]" Name="str_InicialLast" />
+      <Variable x:TypeArguments="x:String" Name="str_Inicial">
+        <Variable.Default>
+          <VisualBasicValue x:TypeArguments="x:String" ExpressionText="String.Concat(str_Last.Substring(0, Math.Min(2, str_Last.Length)), str_Secound.Substring(0, Math.Min(2, str_Secound.Length)))" />
+        </Variable.Default>
+      </Variable>
       <Variable x:TypeArguments="x:String" Default="[in_TransactionItem(&quot;Email&quot;).ToString()]" Name="str_Email" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
@@ -302,7 +304,7 @@
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <Throw Exception="[New BusinessRuleException(&quot;No se envia correo porque solo tiene un apellido&quot;)]" sap:VirtualizedContainerService.HintSize="382,113" sap2010:WorkflowViewState.IdRef="Throw_1" />
+          <Throw Exception="[New BusinessRuleException(in_Config(&quot;BRESecound&quot;).ToString)]" sap:VirtualizedContainerService.HintSize="382,113" sap2010:WorkflowViewState.IdRef="Throw_1" />
         </Sequence>
       </If.Then>
       <If.Else>
@@ -330,7 +332,7 @@
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <Throw Exception="[New BusinessRuleException(&quot;Yahoo no es una dirección valida&quot;)]" sap:VirtualizedContainerService.HintSize="382,113" sap2010:WorkflowViewState.IdRef="Throw_2" />
+          <Throw Exception="[New BusinessRuleException(in_Config(&quot;BREYahoo&quot;).ToString)]" sap:VirtualizedContainerService.HintSize="382,113" sap2010:WorkflowViewState.IdRef="Throw_2" />
         </Sequence>
       </If.Then>
       <If.Else>
@@ -358,7 +360,7 @@
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <Throw Exception="[New BusinessRuleException(&quot;No se trabaja en domingo&quot;)]" sap:VirtualizedContainerService.HintSize="382,113" sap2010:WorkflowViewState.IdRef="Throw_3" />
+          <Throw Exception="[New BusinessRuleException(in_Config(&quot;BREDates&quot;).ToString)]" sap:VirtualizedContainerService.HintSize="382,113" sap2010:WorkflowViewState.IdRef="Throw_3" />
         </Sequence>
       </If.Then>
       <If.Else>
@@ -372,7 +374,7 @@
         </Sequence>
       </If.Else>
     </If>
-    <ui:LogMessage DisplayName="Log Message | Message Final" sap:VirtualizedContainerService.HintSize="418,173" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Info" Message="[&quot;Hola &quot; + str_Name + &quot; &quot; + str_Last +&quot; &quot; + str_Secound + &quot;, gracias por contratar nuestro servicio, tu pedido sera enviado &quot; +str_Dates.AddDays(7).ToString() +&quot;, y puedes pasar a recogerlo dando tus primeras dos letras de cada apellido de esta manera:  &quot; + str_Inicial]">
+    <ui:LogMessage DisplayName="Log Message | Message Final" sap:VirtualizedContainerService.HintSize="418,173" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Info" Message="[&quot;Hola &quot; + str_Name + &quot; &quot; + str_Last +&quot; &quot; + str_Secound + &quot;, gracias por contratar nuestro servicio, tu pedido sera enviado &quot; +str_Dates.AddDays(7).ToString(&quot;yyyy-MM-dd&quot;) +&quot;, y puedes pasar a recogerlo dando tus primeras dos letras de cada apellido de esta manera:  &quot; + str_Inicial]">
       <sap:WorkflowViewStateService.ViewState>
         <scg:Dictionary x:TypeArguments="x:String, x:Object">
           <x:Boolean x:Key="IsExpanded">True</x:Boolean>
